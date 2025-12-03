@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fake News Detector</title>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='Images/Logo.png') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='CSS/R_News.css') }}"
+    />
+  </head>
+  <body>
+    <div class="content">
+      <div class="fancy-heading">
+        <span class="text">HOW TO SPOT REAL NEWS ?</span>
+        <span class="icon">🔍</span>
+      </div>
+
+      <!-- 🔲 Grid of Square Images -->
+      <div class="grid">
+        <img
+          src="{{ url_for('static', filename='Images/R_News/01.png') }}"
+          alt="img1"
+        />
+        <img
+          src="{{ url_for('static', filename='Images/R_News/02.png') }}"
+          alt="img2"
+        />
+        <img
+          src="{{ url_for('static', filename='Images/R_News/03.png') }}"
+          alt="img3"
+        />
+        <img
+          src="{{ url_for('static', filename='Images/R_News/04.png') }}"
+          alt="img4"
+        />
+        <img
+          src="{{ url_for('static', filename='Images/R_News/05.png') }}"
+          alt="img5"
+        />
+        <img
+          src="{{ url_for('static', filename='Images/R_News/06.png') }}"
+          alt="img6"
+        />
+        <img
+          src="{{ url_for('static', filename='Images/R_News/07.png') }}"
+          alt="img7"
+        />
+        <img
+          src="{{ url_for('static', filename='Images/R_News/08.png') }}"
+          alt="img8"
+        />
+        <img
+          src="{{ url_for('static', filename='Images/R_News/09.png') }}"
+          alt="img9"
+        />
+        <img
+          src="{{ url_for('static', filename='Images/R_News/10.png') }}"
+          alt="img10"
+        />
+      </div>
+      <a href="/"><span>&#128072;&#127995;</span> Go Back to Home</a>
+    </div>
+  </body>
+</html>

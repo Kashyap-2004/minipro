@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin Login - OTP Request</title>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='Images/Logo.png') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='CSS/admin_login.css') }}"
+    />
+    <script src="{{ url_for('static', filename='JS/admin_login.js') }}"></script>
+  </head>
+  <body>
+    <div class="modal-container">
+      <!-- Fireflies -->
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+      <div class="firefly"></div>
+
+      <!-- Form -->
+      <form method="POST" onsubmit="showSending(event)">
+        <label for="email">Enter Admin Email:</label>
+        <input type="email" name="email" id="email" required />
+
+        <div class="button-container">
+          <button class="super-button" id="submitBtn">
+            <span id="btnText">Send OTP</span>
+            <span class="dots" id="dots" style="display: none">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </span>
+            <svg fill="none" viewBox="0 0 24 24" class="arrow" id="arrowIcon">
+              <path
+                stroke-linejoin="round"
+                stroke-linecap="round"
+                stroke-width="2"
+                stroke="currentColor"
+                d="M5 12h14M13 6l6 6-6 6"
+              />
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

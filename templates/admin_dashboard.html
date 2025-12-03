@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Fake News Logs</title>
+    <link rel="icon" href="{{ url_for('static', filename='Images/Logo.png') }}" type="image/x-icon">
+   <link rel="stylesheet" href="{{ url_for('static', filename='CSS/admin_dashboard.css') }}">
+   <script src="{{ url_for('static', filename='JS/admin_dashboard.js') }}"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1>📊 Fake News Prediction Logs 📊</h1>
+            <form method="POST" action="/logout" style="display: inline;">
+                <button type="button" class="logout_btn" onclick="showLogoutPopup()">Logout</button>
+            </form>
+        </div>
+        <div class="wave-header" id="wave1"></div>
+        <div class="wave-header" id="wave2"></div>
+        <div class="wave-header" id="wave3"></div>
+    </header>
+      <div style="margin: 20px 30px 0; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 10;">
+    
+    <!-- Left: Delete All -->
+    <form method="POST" action="/delete-all" onsubmit="return confirm('Are you sure you want to delete ALL data? This cannot be undone!');">
+        <button type="submit" class="delete_all_btn" style="background-color: darkred;">
+            🗑️ Delete All Data
+        </button>
+    </form>
+
+    <!-- Right: Add / Manage Admins -->
+    <button class="add_admin_btn" onclick="openAdminEmailModal()">
+        ➕ Add / Manage Admin Emails
+    </button>
+
+</div>
+
+</form>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>News Text</th>
+                    <th>Prediction</th>
+                    <th>Confidence(%)</th>
+                    <th>Feedback</th>
+                    <th>Date & Time</th>
+                    <th>Approve/Reject</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in data %}
+                <tr>
+                    <td>{{ item.text }}</td>
+                    <td>{{ item.result }}</td>
+                    <td>{{ "%.2f" | format(item.confidence) }}</td>
+                    <td>{{item.user_feedback}}</td>
+                    <td style="width: 100px;">
+                        {% if item.timestamp %}
+                        {{ item.timestamp.strftime('%I:%M %p') }}<br>
+                        {{ item.timestamp.strftime('%d-%m-%Y') }}
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </td>
+                    <td id="status-{{ item._id }}" style="width:200px">
+    {% if item.status == "Approved" %}
+        <b style="color: green;">Approved</b>
+    {% elif item.status == "Rejected" %}
+        <b style="color: red;">Rejected</b>
+    {% else %}
+        <form method="POST" action="/approve/{{ item._id }}" style="display:inline;" onsubmit="return handleAction(event, '{{ item._id }}', 'approve')">
+            <button type="submit" class="table-btn-Approve">Approve</button>
+        </form>
+        <form method="POST" action="/reject/{{ item._id }}" style="display:inline; margin-left:10px" onsubmit="return handleAction(event, '{{ item._id }}', 'reject')">
+            <button type="submit" class="table-btn-Reject">Reject</button>
+        </form>
+    {% endif %}
+</td>
+
+                    <td>
+                        <form method="POST" action="/delete/{{ item._id }}" onsubmit="return showDeletePopup(event)">
+                            <button type="submit" class="table-btn">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="footer">
+            © 2025 Fake News Predictor | Admin Panel
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <div style="padding: 20px; text-align: center;">
+                <h3>Are you sure you want to logout?</h3>
+                <div style="margin-top: 20px;">
+                    <button onclick="confirmLogout()" class="modal-button yes-button">Yes</button>
+                    <button onclick="closeLogoutPopup()" class="modal-button no-button">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div style="padding: 20px; text-align: center;">
+                <h3>Are you sure you want to delete this record?</h3>
+                <div style="margin-top: 20px;">
+                    <button onclick="confirmDelete()" class="modal-button yes-button">Yes</button>
+                    <button onclick="closeDeletePopup()" class="modal-button no-button">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-container" id="adminEmailModal" style="display: none;">
+    <!-- Fireflies -->
+    <div class="firefly"></div><div class="firefly"></div><div class="firefly"></div>
+    <div class="firefly"></div><div class="firefly"></div><div class="firefly"></div>
+    <div class="firefly"></div><div class="firefly"></div><div class="firefly"></div>
+    <div class="firefly"></div>
+
+    <div class="admin-modal">
+      <h3>Manage Admin Emails</h3>
+
+ <ul style="list-style: none; padding-left: 0;">
+  {% set hidden_email = "bubbleaiml03@gmail.com" %}
+  {% for admin in admin_emails %}
+    {% if admin.email != hidden_email %}
+      <li style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+        <span>{{ admin.email }}</span>
+        <form method="POST" action="/delete-admin-email/{{ admin._id }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this admin email?');">
+          <button class="super-button" style="padding: 6px 12px; font-size: 12px;">Delete</button>
+        </form>
+      </li>
+    {% endif %}
+  {% else %}
+    <li>No admin emails found.</li>
+  {% endfor %}
+</ul>
+
+
+      <form method="POST" action="/add-admin-email">
+        <input type="email" name="email" placeholder="Enter new admin email" required>
+        <div class="modal-buttons">
+          <button type="submit" class="super-button">Add Email</button>
+          <button type="button" class="super-button" onclick="document.getElementById('adminEmailModal').style.display='none'">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
+</body>
+</html>
+

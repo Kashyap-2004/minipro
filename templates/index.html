@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fake News Detector</title>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='Images/Logo.png') }}"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='CSS/index.css') }}"
+    />
+  </head>
+  <script>
+    function openAdminLoginModal() {
+        document.getElementById("adminLoginModal").style.display = "block";
+    }
+    function closeAdminLoginModal() {
+        document.getElementById("adminLoginModal").style.display = "none";
+    }
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearImage() {
+        document.getElementById('imageInput').value = '';
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('previewImg').src = '';
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        // Text form submission
+        const form = document.getElementById('newsForm');
+        if (form) {
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('spinner');
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                btnText.textContent = "Processing...";
+                spinner.style.display = "inline-block";
+                submitBtn.disabled = true;
+                setTimeout(() => {
+                    form.submit();
+                }, 1000);
+            });
+        }
+
+        // Image form submission
+        const imageForm = document.getElementById('imageForm');
+        if (imageForm) {
+            const imageSubmitBtn = document.getElementById('imageSubmitBtn');
+            const imageBtnText = document.getElementById('imageBtnText');
+            const imageSpinner = document.getElementById('imageSpinner');
+
+            imageForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const fileInput = document.getElementById('imageInput');
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    alert('Please select an image first');
+                    return;
+                }
+                imageBtnText.textContent = "Processing...";
+                imageSpinner.style.display = "inline-block";
+                imageSubmitBtn.disabled = true;
+                setTimeout(() => {
+                    imageForm.submit();
+                }, 1000);
+            });
+        }
+
+        // Show popup if result exists
+        {% if result %}
+            const popup = document.getElementById("popup");
+            if (popup) {
+                popup.style.display = "flex";
+            }
+        {% endif %}
+
+        // Close popup on background click
+        document.addEventListener("click", function (e) {
+            const popup = document.getElementById("popup");
+            if (popup && e.target === popup) {
+                popup.style.display = "none";
+            }
+        });
+    });
+  </script>
+
+  <body>
+    <header>
+      <div class="header-content">
+        <h1>FAKE NEWS DETECTOR</h1>
+        <a onclick="openAdminLoginModal()" class="admin_btn">Admin Login</a>
+      </div>
+      <div class="wave-header" id="wave1"></div>
+      <div class="wave-header" id="wave2"></div>
+      <div class="wave-header" id="wave3"></div>
+    </header>
+    <div class="nav-buttons">
+      <a href="/fake-news" class="nav-btn1">
+        <span class="typing-container typing1">Fake News....?</span>
+      </a>
+      <img
+        src="{{ url_for('static', filename='Images/Logo.png') }}"
+        alt="Logo"
+        class="logo"
+      />
+      <a href="/real-news" class="nav-btn2">
+        <span class="typing-container typing2">Real News....?</span>
+      </a>
+    </div>
+
+    <div>
+      <h3 class="animated-text">Uncover the Truth! 🕵️‍♂️🔍</h3>
+      <p class="text1">
+        Enter your news article below and let our AI-powered Fake News Detector
+        analyze whether it's fact or fiction. Stay informed, stay aware!
+      </p>
+    </div>
+
+    <main>
+      <form class="main-form" method="POST" id="newsForm">
+        <textarea name="message" placeholder="Your Message" rows="5" required>
+{{ news_text }}</textarea
+        >
+        <button type="submit" id="submitBtn">
+          <span id="btnText">SUBMIT</span>
+          <span id="spinner" style="display: none">⏳</span>
+        </button>
+      </form>
+
+      <!-- Image Upload Section -->
+      <div class="image-upload-section">
+        <h3>Or Analyze an Image</h3>
+        <form class="image-form" method="POST" id="imageForm" enctype="multipart/form-data">
+          <div class="image-input-container" style="position: relative; overflow: hidden;">
+            <input 
+              type="file" 
+              name="image" 
+              id="imageInput" 
+              accept="image/*" 
+              onchange="previewImage(event)"
+            />
+            <label for="imageInput" class="image-label">
+              Click to upload or drag image here
+            </label>
+          </div>
+          <div id="imagePreview" class="image-preview" style="display: none;">
+            <img id="previewImg" src="" alt="Preview" />
+            <button type="button" onclick="clearImage()" class="clear-btn">Remove Image</button>
+          </div>
+          <button type="submit" id="imageSubmitBtn" class="image-submit-btn">
+            <span id="imageBtnText">ANALYZE IMAGE</span>
+            <span id="imageSpinner" style="display: none">⏳</span>
+          </button>
+        </form>
+      </div>
+
+      {% if result %}
+      <div id="popup" class="popup">
+        <div class="popup-content">
+          <h2>Prediction Result</h2>
+          <p
+            id="resultText"
+            class="{{ 'real' if result == 'Real' else 'fake' }}"
+          >
+            <strong>{{ result }}</strong><br />
+            Confidence: <strong>{{ confidence }}%</strong>
+          </p>
+
+          <h4>Are You Satisfied?</h4>
+          <form
+            method="POST"
+            action="/"
+            style="
+              display: flex;
+              justify-content: center;
+              gap: 20px;
+              margin-top: 10px;
+            "
+          >
+            <input type="hidden" name="text" value="{{ news_text }}" />
+            <input type="hidden" name="prediction" value="{{ result }}" />
+            <input type="hidden" name="confidence" value="{{ confidence }}" />
+            <button name="feedback" value="Yes" type="submit" id="nav-btn3">
+              Yes
+            </button>
+            <button name="feedback" value="No" type="submit" id="nav-btn4">
+              No
+            </button>
+          </form>
+
+          <a href="/" class="back-btn">Go Back</a>
+        </div>
+      </div>
+      {% endif %}
+    </main>
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title">Admin Login</span>
+          <span class="close" onclick="closeAdminLoginModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <iframe src="{{ url_for('admin_login') }}"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <footer class="custom-footer">
+      <div class="footer-content">
+        <div class="footer-left">
+          <p>Fake News Detector</p>
+          <p class="tagline">Secure • Accurate • Intelligent</p>
+        </div>
+        <div class="footer-anim-container">
+          <div class="glow-circle"></div>
+          <div class="glow-circle"></div>
+          <div class="glow-circle"></div>
+          <div class="glow-circle"></div>
+          <div class="glow-circle"></div>
+        </div>
+
+        <div class="footer-right">
+          <p>&copy; 2025 Fake News Detector</p>
+          <p>Developed with ❤️ by:</p>
+          <ul class="dev-list">
+            <li>Atri Biswas</li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
